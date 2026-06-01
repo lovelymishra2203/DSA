@@ -1,0 +1,86 @@
+/*
+  Count Subarrays with XOR K
+
+  Brute: O(n³)
+  Generate every subarray and recompute XOR.
+  i -> start of subarray
+  j -> end of subarray
+  k -> recompute XOR from i to j
+
+
+  Better:
+  Pattern: Subarray Generation
+  
+  Generate all subarrays.
+  Keep XOR of current subarray.
+  
+  TC: O(n²)
+  SC: O(1)
+*/
+
+class Solution {
+  public:
+    long subarrayXor(vector<int> &arr, int k) {
+        // code here
+        int n = arr.size();
+        long cnt=0;
+        for(int i=0; i<n; i++){
+            long res=0;
+            for(int j=i ; j<n; j++){
+                res^=arr[j];
+                if(res==k) cnt++;
+            }
+        }
+        return cnt;
+    }
+};
+
+
+
+/*
+  Optimal:
+  Pattern: Prefix XOR + Hashmap
+  
+  Store frequency of prefix XORs.
+  prevXor ^ currXor = k
+  => prevXor = currXor ^ k
+  So, need = currXor ^ k
+  hash[need] = No. of valid previous prefix XORs
+  cnt += hash[need]
+  
+  Initialize:
+  hash[0] = 1
+  
+  Reason:
+  When currXor == k:
+  
+  need = currXor ^ k
+       = k ^ k
+       = 0
+  
+  Need one prefix XOR = 0
+  before array starts.
+  
+  TC: O(n)
+  SC: O(n)
+*/
+class Solution {
+  public:
+    long subarrayXor(vector<int> &arr, int k) {
+        // code here
+        int n = arr.size();
+        long cnt=0;
+        unordered_map<int, int> hash;
+        int xorr = 0;
+        hash[xorr]++;
+        for(int i=0; i<n; i++){
+            xorr ^= arr[i];
+            int need = xorr ^ k;
+            if(hash.find(need) != hash.end()){
+                cnt += hash[need];
+            }
+            hash[xorr]++;
+        }
+        return cnt;
+    }
+};
