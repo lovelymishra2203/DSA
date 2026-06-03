@@ -1,0 +1,144 @@
+/*
+  Merge Two Sorted Arrays Without Extra Space
+  
+  Approach using Extra Space
+  Pattern: Two Pointers + Extra Array
+  
+  Merge both arrays into temp.
+  Copy first n elements back to a.
+  Copy remaining m elements to b.
+  
+  TC: O(n+m)
+  SC: O(n+m)
+*/
+
+class Solution {
+  public:
+    void mergeArrays(vector<int>& a, vector<int>& b) {
+        // code here
+        int n = a.size();
+        int m = b.size();
+        vector<int> temp;
+        int i = 0, j = 0;
+        while(i < n && j < m){
+            if(a[i] <= b[j]) temp.push_back(a[i++]);
+            else temp.push_back(b[j++]);
+        }
+        while(i < n) temp.push_back(a[i++]);
+        while(j < m) temp.push_back(b[j++]);
+        
+        for(int k = 0; k < m + n; k++){
+            if(k < n) a[k] = temp[k];
+            else b[k - n] = temp[k];
+        }
+    }
+};
+
+
+/*
+  Optimal 1:
+  Pattern: Two Pointers
+  
+  i = last element of a
+  j = first element of b
+  
+  Swap if a[i] > b[j].
+  
+  Reason:
+  Small elements should belong to a.
+  Large elements should belong to b.
+  
+  After swapping:
+  a and b contain correct elements,
+  but may not be individually sorted.
+  
+  Sort both arrays separately.
+  
+  TC: O(min(n,m)) + O(n log n) + O(m log m)
+  SC: O(1)
+*/
+
+class Solution {
+  public:
+    void mergeArrays(vector<int>& a, vector<int>& b) {
+        // code here
+        int n = a.size();
+        int m = b.size();
+        int i = n - 1, j = 0;
+        while(i >= 0 && j < m && a[i] >= b[j]) swap(a[i--], b[j++]);
+        sort(a.begin(), a.end());
+        sort(b.begin(), b.end());
+    }
+};
+
+
+/*
+  Optimal 2:
+  Pattern: Gap Method (Shell Sort Idea)
+  
+  Treat a and b as a single array.
+  
+  Compare elements at distance = gap.
+  
+  If left element > right element:
+      swap
+  
+  Reduce gap:
+  
+  gap = (gap / 2) + (gap % 2)
+  
+  Reason:
+  If gap is odd, add the remainder
+  to get ceil(gap/2).
+  
+  Example:
+  5 -> 2 + 1 = 3
+  3 -> 1 + 1 = 2
+  2 -> 1 + 0 = 1
+  
+  Process the entire pass for gap = 1.
+  
+  Then break.
+  
+  Reason:
+  (1 / 2) + (1 % 2) = 1
+  
+  Gap would stay 1 forever,
+  causing an infinite loop.
+  
+  TC: O((n+m) log(n+m))
+  Reason: One pass for each gap (approx covers whole length) = O(n+m)
+  Gap reduces by half each time.
+  So, No. of gaps = O(log(n+m))
+
+  SC: O(1)
+*/
+
+class Solution {
+  public:
+    void mergeArrays(vector<int>& a, vector<int>& b) {
+        // code here
+        int n = a.size();
+        int m = b.size();
+        int len = n + m;
+        int gap = (len / 2) + (len % 2);
+        while(gap >= 1){
+            int left = 0;
+            int right = left + gap;
+            while(right < len) {
+                if(left < n && right < n) {
+                    if(a[left] > a[right]) swap(a[left], a[right]);
+                }
+                else if(left < n && right >= n) {
+                    if(a[left] > b[right - n]) swap(a[left], b[right - n]);
+                }
+                else {
+                    if(b[left - n] > b[right - n]) swap(b[left - n], b[right - n]);
+                }
+                left++, right++;
+            }
+            if(gap == 1) break;
+            gap = (gap / 2) + (gap % 2);
+        }
+    }
+};
