@@ -1,0 +1,83 @@
+/*
+  Count Inversions
+  
+  Brute:
+  Pattern: Pair Checking
+  
+  For every pair (i, j):
+  Check if arr[i] > arr[j]
+  
+  TC: O(n²)
+  SC: O(1)
+*/
+
+class Solution {
+  public:
+    int inversionCount(vector<int> &arr) {
+        // Code Here
+        int n = arr.size();
+        int cnt = 0;
+        for(int i = 0; i < n; i++){
+            for(int j = i + 1; j < n; j++){
+                if(arr[i] > arr[j]) cnt++;
+            }
+        }
+        return cnt;
+    }
+};
+
+
+/*
+Optimal:
+Pattern: Merge Sort
+
+While merging two sorted halves:
+If left[i] > right[j]:
+
+All remaining elements in left half also form inversions with right[j].
+
+cnt += remaining elements in left
+
+Reason:
+Left half is already sorted.
+
+TC: O(n log n)
+SC: O(n)
+*/
+
+class Solution {
+  public:
+    int count(vector<int>& arr, int start, int mid, int end){
+        int n1 = mid - start + 1;
+        int n2 = end - mid;
+        int cnt = 0;
+        vector<int> temp1(n1), temp2(n2);
+        for(int i = 0; i < n1; i++) temp1[i] = arr[start + i];
+        for(int j = 0; j < n2; j++) temp2[j] = arr[mid + 1 + j];
+        
+        int i = 0, j = 0, k = start;
+        while(i < n1 && j < n2) {
+            if(temp1[i] <= temp2[j]) arr[k++] = temp1[i++];
+            else {
+                arr[k++] = temp2[j++];
+                cnt += n1 - i; // All remaining elements in left half also form inversions
+            }
+        }
+        while(i < n1) arr[k++] = temp1[i++];
+        while(j < n2) arr[k++] = temp2[j++];
+        return cnt;
+    }
+    int divide(vector<int>& arr, int start, int end){
+        int cnt = 0;
+        if(start >= end) return cnt;
+        int mid = start + (end - start) / 2;
+        cnt += divide(arr, start, mid);
+        cnt += divide(arr, mid + 1, end);
+        cnt += count(arr, start, mid, end);
+        return cnt;
+    }
+    int inversionCount(vector<int> &arr) {
+        // Code Here
+        return divide(arr, 0, arr.size() - 1);
+    }
+};
