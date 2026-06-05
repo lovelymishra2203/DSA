@@ -1,0 +1,50 @@
+/*
+  Implement Lower Bound
+  
+  Pattern: Binary Search
+  
+  Lower Bound - First index such that:
+  
+  arr[i] >= target
+  
+  If no such element exists: return n
+  
+  If arr[mid] >= target:
+      Store answer
+      Search left half
+  
+  Else:
+      Search right half
+  
+  TC: O(log n)
+  SC: O(1)
+*/
+
+class Solution {
+  public:
+    int lowerBound(vector<int>& arr, int target) {
+        // code here
+        int low = 0, high = arr.size() - 1;
+        int ans = arr.size();
+        while(low <= high){
+            int mid = low + (high - low) / 2;
+            if(arr[mid] >= target){
+                ans = mid;
+                high = mid - 1;
+            }
+            else low = mid + 1;
+        }
+        return ans;
+    }
+};
+
+
+// STL 
+class Solution {
+  public:
+    int lowerBound(vector<int>& arr, int target) {
+        // code here
+        int ans = lower_bound(arr.begin(), arr.end(), target) - arr.begin();
+        return ans;
+    }
+};
