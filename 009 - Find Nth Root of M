@@ -1,0 +1,90 @@
+/*
+  Find Nth Root of M
+
+  Brute:
+
+  Try every number from 0 to m.
+
+  If:
+      iⁿ == m
+      Return i
+
+  If:
+      iⁿ > m
+      Stop searching
+
+  TC: O(m * n)
+  SC: O(1)
+*/
+
+class Solution {
+  public:
+    int nthRoot(int n, int m) {
+        // Code here
+        int ans = -1;
+        for(int i = 0; i <= m ; i++){
+            int temp = pow(i, n);
+            if(temp == m) {
+                ans = i;
+                break;
+            }
+            else if(temp > m) break;
+        }
+        return ans;
+    }
+};
+
+/*
+  Optimal:
+
+  Pattern: Binary Search on Answer
+
+  Search space:
+  0 to m
+
+  Check:
+
+  midⁿ == m
+      Return mid
+
+  midⁿ < m
+      Search right half
+
+  midⁿ > m
+      Search left half
+
+  Use custom power function
+  and stop early if value > m 
+  to prevent overflow and
+  avoid unnecessary work.
+
+  TC: O(n log m)
+  SC: O(1)
+*/
+
+class Solution {
+  public:
+    // return 1 if == m
+    // return 0 if < m
+    // return -1 if > m
+    int power(int mid, int n, int m){
+        long long res = 1;
+        for(int i = 1; i <= n; i++){
+            res *= mid;
+            if(res > m) return -1;
+        }
+        if(res == m) return 1; 
+        return 0;
+    }
+    int nthRoot(int n, int m) {
+        int low = 0, high = m;
+        while(low <= high){
+            long long mid = low + (high - low) / 2;
+            int temp = power(mid, n, m);
+            if(temp == 1) return mid;
+            else if(temp == 0) low = mid + 1;
+            else high = mid - 1;
+        }
+        return -1;
+    }
+};
